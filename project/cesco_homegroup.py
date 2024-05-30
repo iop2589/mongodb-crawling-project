@@ -18,20 +18,26 @@ if response.status_code == 200:
   result_object = json.loads(jsonStr)
   json_list.append(result_object["response"]["body"]["items"]["item"])
   print(json_list)
+else:
+  print("List 정보 조회 불가", response.status_code)
   
 for json_data in json_list[0]:
   detail_params = {"serviceKey": service_key, "kaptCode": json_data["kaptCode"]}
   detail_reponse = requests.get(detail_url, params=detail_params)
-  detail_result = json.dumps(xmltodict.parse(detail_reponse.text), indent=4, ensure_ascii=False)
-  detail_result_json = json.loads(detail_result)
-  detail_info = detail_result_json["response"]["body"]["item"]
-  print ("공동주택코드:", json_data["kaptCode"], 
-        "공동주택명:", json_data["kaptName"], 
-        "법정동코드:", detail_info["bjdCode"], 
-        "아파트유형:", detail_info["codeAptNm"], 
-        "관리방식:", detail_info["codeMgrNm"], 
-        "주소:", detail_info["kaptAddr"], 
-        "시공사:", detail_info["kaptBcompany"], 
-        "시행사:", detail_info["kaptAcompany"])
-
+  
+  if detail_reponse.status_code == 200:
+    detail_result = json.dumps(xmltodict.parse(detail_reponse.text), indent=4, ensure_ascii=False)
+    detail_result_json = json.loads(detail_result)
+    detail_info = detail_result_json["response"]["body"]["item"]
+    print ("공동주택코드:", json_data["kaptCode"], 
+          "공동주택명:", json_data["kaptName"], 
+          "법정동코드:", detail_info["bjdCode"], 
+          "아파트유형:", detail_info["codeAptNm"], 
+          "관리방식:", detail_info["codeMgrNm"], 
+          "주소:", detail_info["kaptAddr"], 
+          "시공사:", detail_info["kaptBcompany"], 
+          "시행사:", detail_info["kaptAcompany"])
+  else:
+    print("detail 정보 조회 불가", detail_reponse.status_code)
+    
 
